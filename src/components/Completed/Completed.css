@@ -1,0 +1,8 @@
+.completed{
+    background-color:#ffa502 ;
+    width: 50%;
+    height: 100%;
+    position: relative;
+    top: -100%;
+    left: 50%;
+}
