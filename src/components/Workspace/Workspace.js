@@ -5,25 +5,30 @@ import Completed from '../Completed/Completed';
 
 
 const WorkSpace = (props) => {
-
-    var newtasks= props.tasks.filter((workingTask)=>{
-        return workingTask.isCompleted===false;
+    
+    var workingTasks= props.tasks.filter((workingTask)=>{
+        return (workingTask.isCompleted===false && workingTask.projectKey===props.currentProjectId);
     })
 
-    var completedTasks= props.currentProject.tasks.filter((completedTask)=>{
-        return completedTask.isCompleted===true;
+    var completedTasks= props.tasks.filter((completedTask)=>{
+        return (completedTask.isCompleted===true && completedTask.projectKey===props.currentProjectId);
     })
   
 
     return(
         <div className="workhere">
-            <Working handleTask={props.handleTask}
+            <Working 
+            //    handleTask={props.handleTask}
                 handleAdd={props.handleAdd}
                 currentText={props.currentText}
-                // workingTasks={workingTasks}
-                tasks={newtasks}
+                tasks={workingTasks}
+                updateCurrentText={props.updateCurrentText}
+                handleDeleteTask={props.handleDeleteTask}
+                handleCheckSquare={props.handleCheckSquare}
             />
-            <Completed completedTasks={completedTasks}/>
+            <Completed tasks={completedTasks}
+                handleDeleteTask={props.handleDeleteTask}    
+            />
         </div>
     )
 }

@@ -4,7 +4,7 @@
     top:0;
     left: 0;
     width: 25vw;
-    height: 100vh;
+    min-height: 96vh;
     overflow-y: scroll;
     box-shadow: 2px 0px 4px #bdc3c7;
     text-align: center;
@@ -41,7 +41,7 @@
 
     font-size: 140%;
     border: none;
-    margin-top: 1.2em;
+    margin-top: 0.5em;
     width: 20vw;
     height: 3em;
     transition: 0.3s;
@@ -74,3 +74,5 @@
 ::-webkit-scrollbar {
     width: 0px;
   }
+
+  

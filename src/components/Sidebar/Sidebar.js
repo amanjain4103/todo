@@ -7,14 +7,14 @@ const Sidebar = (props) => {
 
     let projectlist = props.projects.map((project)=>{
         return <button className="projectname" 
-                    key={project.id}
-                    onClick={()=>props.handleCurrentProject(project.id)}
+                    key={project.projectKey}
+                    onClick={()=>props.handleCurrentProjectId(project.projectKey)}
                 >
                     {project.name}
                     <span>
                         <FontAwesomeIcon icon={ faTrash } 
                             size='1x'
-                            onClick={()=>props.handleDeleteProject(project.id)} 
+                            onClick={()=>props.handleDeleteProject(project.projectKey)} 
                         />
                     </span>
                </button>

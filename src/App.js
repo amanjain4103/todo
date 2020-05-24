@@ -4,7 +4,6 @@ import Sidebar from './components/Sidebar/Sidebar';
 import Workspace from './components/Workspace/Workspace';
 import './App.css';
 
-var tasks =[];
 var temp=Date.now();
 
 class App extends React.Component{
@@ -12,133 +11,145 @@ class App extends React.Component{
     super();
     this.state = {
       route:"main",
-      projects:[
-        { "id":temp,
-          "name":"welcome",
-          "tasks":[
-            {"key":temp, "text":"this is a sample task" , "isCompleted":false}
-          
-          ]
-        }
+      projects:[{ "projectKey":temp,
+                 "name":"welcome"}
       ],
-      currentTask:{},
-      currentText:"",
+      tasks:[{"taskKey":temp,
+              "text":"this is sample text",
+              "isCompleted":false,
+              "projectKey":temp}
+      ],
       currentProjectId:temp,
-      currentProject:{ "id":temp,
-      "name":"welcome",
-      "tasks":[
-        {"key":temp , "text":"this is a sample task" , "isCompleted":false}
-      
-      ]
+      currentText:""
     }
-    };
   }
+
+
+
 
 
 
   handleLogin = (event)=>{
-    this.setState({
-      route:"loggedin"
-    })
-  }
-
+        this.setState({
+          route:"loggedin"
+        })
+      }
+    
   handleLogout = (event)=>{
     this.setState({
       route:"main"
     })
   }
-  
+
+  //adding project functionality button in maintained
+  //triggered when add project button is clicked 
   handleProjectName = () => {
-    var projectName = prompt("enter project name");
-    if(projectName!==null){
-      if(projectName.trim()!==""){
+    var newProjectName = prompt("Enter project name");
+    if(newProjectName!==null){
+      if(newProjectName.trim()!==""){
+
+        var newProject = { "projectKey":Date.now(),"name":newProjectName } 
+        var updatedProjects = [...this.state.projects,newProject];
+        
         this.setState({
-          projects:[...this.state.projects,{"id":Date.now(),
-                                            "name":projectName,
-                                            "tasks":[
-                                              {"key":Date.now()-22222 , "text":"this is a sample task" , "isCompleted":false}
-                                            ]
-                                           }
-          ]
-        });
+          projects:updatedProjects
+        })
+        
       }
     }
-
-  }
-
-  handleDeleteProject = (id)=>{
-    var updateProjects = this.state.projects.filter((project)=>{
-      return project.id!==id
-    }) 
-    this.setState({
-      projects:updateProjects
-    })
-  }
-
-  handleTask =(event)=>{
-    this.setState({
-      currentText:event.target.value
-    })
-  }
-
-  handleAdd =(event)=>{
-    event.preventDefault();
     
+  }
 
-    if(this.state.currentText!==null){
-      if(this.state.currentText.trim()!==""){
-        var tempCurrentTask={"key":Date.now() , "text":this.state.currentText , "isCompleted":false}
-        if(this.state.currentProject.id===temp){
-          tasks=[...tasks,tempCurrentTask]
-        }else{
-          tasks=[...this.state.currentProject.tasks,tempCurrentTask]
-        }
-        this.setState({
-          currentTask:tempCurrentTask,
-          currentText:""
-        },function(){
-          
-        })
+  //this is deleting project and also tasks associated with that project
+  //triggered when trash icon of project is clicked 
+  handleDeleteProject = (projectKey) => {
+    
+    //asking for confirmation 
+    var areYouSure = window.confirm("Are you sure, this will delete your project");
+    
+    if(areYouSure){
 
-        var myprojects = this.state.projects;
-        //finds project I want to modify in list of projects
-        let method = () =>{
-          for(let i=0;i<myprojects.length;i++){
-            if(myprojects[i].id===this.state.currentProjectId){
-              myprojects[i].tasks.push(this.state.currentTask);
-            }
-          }
-          
-        }
-        setTimeout(method,150)
-        this.setState({
-          projects:myprojects
-        })
-        console.log(tasks)
-      } 
+      //deleting projects
+      var updatedProject = this.state.projects.filter((project)=>{
+        return project.projectKey!==projectKey
+      })
+      this.setState({
+        projects:updatedProject
+      })
+
+      //deleting tasks
+      var updatedtasks = this.state.tasks.filter((task)=>{
+        return task.projectKey!==projectKey
+      })
+
+      this.setState({
+        tasks:updatedtasks
+      })
+
     }
 
-    //adding global tasks
-    
-
   }
 
-  //note that argument and state currentprojectid has difference in its uppercasr and lowercase
-  handleCurrentProject = (currentprojectid) =>{
+  //this will update the state of currentProjectId
+  //triggered when you click on project name
+  handleCurrentProjectId = (currentprojectid) =>{
+    this.setState({currentProjectId:currentprojectid})
+  }
+
+
+  //this will update the input field by updating currentText state
+  //called when change is detected in task adding input box
+  updateCurrentText = (event) => {
+    this.setState({currentText:event.target.value})
+  }
+
+  //this will create new task having current projectKey
+  //triggered when + button is clicked 
+  handleAdd = (event) => {
+    event.preventDefault(); 
+    let textTyped = this.state.currentText
     
-    this.setState({
-      currentProjectId:currentprojectid
+    if(textTyped!==null){
+      if(textTyped.trim()!==""){
+        var newTask = {"taskKey":Date.now(),
+          "text":this.state.currentText,
+          "isCompleted":false,
+          "projectKey":this.state.currentProjectId 
+        }
+        
+        var updatedTasks = [...this.state.tasks,newTask];
+        this.setState({tasks:updatedTasks,currentText:""})
+
+      }
+    }
+  }
+
+  //this will delete task simply using filter on taskKey
+  //triggered when you click trash icon of any task
+  handleDeleteTask = (taskkey) => {
+    
+    var updatedTasks = this.state.tasks.filter((task)=>{
+      return task.taskKey!==taskkey
     })
 
-    var tempProject = this.state.projects.filter((project)=>{
-      return project.id===currentprojectid
+    this.setState({tasks:updatedTasks})
+  }
+
+
+  //this will get task having just checked check square set isCompleted property of that task to true
+  //triggered when you click on check square icon
+  handleCheckSquare = (taskkey) => {
+    var updatedTasks = this.state.tasks.filter((task)=>{
+      return task.taskKey!==taskkey
     })
-    var thisProject = tempProject[0];
-    tasks=[...thisProject.tasks]
-    this.setState({
-      currentProject:thisProject
+
+    var completedTask = this.state.tasks.filter((task)=>{
+      return task.taskKey===taskkey
     })
-    
+    completedTask[0].isCompleted=true;
+    updatedTasks.push(completedTask[0]);
+
+    this.setState({tasks:updatedTasks})
   }
 
   render(){
@@ -149,18 +160,21 @@ class App extends React.Component{
                 handleLogout={this.handleLogout}
         />
 
-        <Sidebar handleProjectName={this.handleProjectName} 
+        <Sidebar 
+                 handleProjectName={this.handleProjectName} 
                  projects={this.state.projects}
                  handleDeleteProject={this.handleDeleteProject}
-                 handleCurrentProject={this.handleCurrentProject}
-                 
-        />
+                 handleCurrentProjectId={this.handleCurrentProjectId}
+                 />
 
-        <Workspace handleTask={this.handleTask}
+        <Workspace 
                    handleAdd={this.handleAdd}
                    currentText={this.state.currentText}
-                   currentProject={this.state.currentProject}
-                   tasks={tasks}
+                   currentProjectId={this.state.currentProjectId}
+                   tasks={this.state.tasks}
+                   updateCurrentText={this.updateCurrentText}
+                   handleDeleteTask ={this.handleDeleteTask}
+                   handleCheckSquare={this.handleCheckSquare}
         />
       </div>
     )
@@ -168,3 +182,10 @@ class App extends React.Component{
 }
 
 export default App;
+
+
+
+
+
+
+

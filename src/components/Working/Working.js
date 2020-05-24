@@ -8,18 +8,18 @@ const Working = (props) => {
 
 
     var tasklist = props.tasks.map((task)=>{
-        return <button key={task.key}>
+        return <button key={task.taskKey}>
                     <span className="checksquare">
                         <FontAwesomeIcon icon={ faCheckSquare } 
                                     size='1x'
-                                    // onClick={()=>props.handleDeleteProject(project.id)} 
+                                    onClick={()=>props.handleCheckSquare(task.taskKey)} 
                         />
                     </span>
 
                     <span className="trash">
                     <FontAwesomeIcon icon={ faTrash } 
                             size='1x'
-                            // onClick={()=>props.handleDeleteProject(project.id)} 
+                            onClick={()=>props.handleDeleteTask(task.taskKey)} 
                         />    
                     </span>
                     {task.text}
@@ -33,7 +33,7 @@ const Working = (props) => {
             <form onSubmit={props.handleAdd}>
                 <input type="text" className="taskadder" 
                     value={props.currentText} 
-                    onChange={props.handleTask} 
+                    onChange={props.updateCurrentText} 
                 />
                 <button type="submit">+</button>
             </form>

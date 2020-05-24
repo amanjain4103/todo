@@ -22,11 +22,13 @@
     width: 100px;
     text-align: center;
     font-weight: 450;
-    transition: 0.5s;
+    transition: 0.3s;
 }
 
 .nav a:hover{
     transform: translate(12);
     background-color: white;
-    color: #a29bfe;
+    color: #837aff;
+
 }
+
