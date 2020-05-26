@@ -32,3 +32,24 @@
 
 }
 
+.loadButton{
+    text-decoration: none;
+    float:right;
+    position: relative;
+    top: 32px;
+    margin-right: 1.2em;
+    width: 100px;
+    text-align: center;
+    font-weight: 450;
+}
+
+.fullname{
+    color: white;
+    font-weight: 400;
+    font-size: 130%;
+    clear: both;
+    float: left;
+    margin-top: 0.7em;
+    margin-left: 2em;
+    cursor: pointer;
+}

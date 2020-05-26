@@ -2,14 +2,103 @@ import React from 'react';
 import Navbar from './components/Navbar/Navbar';
 import Sidebar from './components/Sidebar/Sidebar';
 import Workspace from './components/Workspace/Workspace';
+import Loginpage from './components/Loginpage/Loginpage.js';
+import Registerpage from './components/Registerpage/Registerpage.js';
+import { WaveLoading } from 'react-loadingg';
 import './App.css';
+import PageLoading from './components/PageLoading/PageLoading';
 
+
+// var stateToUpload={};
 var temp=Date.now();
+
+
 
 class App extends React.Component{
   constructor(){
     super();
     this.state = {
+      route:"main",
+      projects:[{ "projectKey":temp,
+                "name":"welcome"}
+      ],
+      tasks:[{"taskKey":temp,
+              "text":"this is sample text",
+              "isCompleted":false,
+              "projectKey":temp}
+      ],
+      currentProjectId:temp,
+      currentText:"",
+      isLoggedIn:false,
+      fullname:"Hii There !!!",
+      gmail:"",
+      isSaveLoading:false,
+      isPageLoading:true
+    };
+  }
+
+  componentDidMount(){
+    this.setState({
+      isPageLoading:false
+    })
+  }
+  //this will save all changes you made to your to do list
+  //this is triggered when you are logged in and click on save button
+  
+  handleSave = ()=>{
+    if(this.state.gmail.trim()!==""){
+      this.setState({
+        isSaveLoading:true
+      })
+      fetch("http://localhost:4000/update",{
+          headers:{
+              'Content-Type':'application/json'
+          },
+          method:"POST",
+          body: JSON.stringify({
+            gmail:this.state.gmail,
+            projects:this.state.projects,
+            tasks:this.state.tasks
+          }) 
+      }).then(res=>res.json())
+       .then(res=>{
+         if(res==="updated"){
+          this.setState({
+            isSaveLoading:false
+          })
+         }else{
+          this.setState({
+            isSaveLoading:false
+          })
+          alert("cant't raech server");
+         }
+       })
+       .catch(err => {
+        this.setState({
+            isSaveLoading:false
+        })
+        alert("can't reach to server")
+        console.log(err)
+        })
+      
+  
+    }else{
+      console.log("not logged in")
+    }
+    
+  }
+
+
+  handleLogin = ()=>{
+
+        this.setState({
+          route:"loginpage"
+        })
+  }
+    
+  handleLogout = ()=>{
+    this.handleSave();
+    this.setState({
       route:"main",
       projects:[{ "projectKey":temp,
                  "name":"welcome"}
@@ -20,22 +109,21 @@ class App extends React.Component{
               "projectKey":temp}
       ],
       currentProjectId:temp,
-      currentText:""
-    }
+      currentText:"",
+      isLoggedIn:false,
+      fullname:"Hii There !!!",
+      gmail:"",
+      isSaveLoading:false
+    })
   }
 
+  handleRegister = ()=>{
+    this.setState({
+      route:"registerpage"
+    })
+  }
 
-
-
-
-
-  handleLogin = (event)=>{
-        this.setState({
-          route:"loggedin"
-        })
-      }
-    
-  handleLogout = (event)=>{
+  handleHome = ()=>{
     this.setState({
       route:"main"
     })
@@ -150,36 +238,129 @@ class App extends React.Component{
     updatedTasks.push(completedTask[0]);
 
     this.setState({tasks:updatedTasks})
+  } 
+
+  //this will change route according to user register status
+  //triggered when response for register form is recieved
+  onRouteChangeInRegisterForm = () => {
+    this.setState({
+      route:"loginpage"
+    })
   }
 
+  //this will change all view of the homepage and update state for db data
+  //triggered when we recieve userData
+  whenLoginFormRecieveData = (user) => {
+    this.setState({
+      route:"main",
+      isLoggedIn:true,
+      projects:user.projects,
+      tasks:user.tasks,
+      fullname:user.fullname,
+      gmail:user.gmail
+    })
+  }
+
+  //adding event listener so that when user closes this webapp his data will be saved
+  
+  // componentWillUnmount(){
+  //   window.addEventListener('beforeunload',(ev)=>{
+  //     ev.preventDefault();
+  //     console.log("hjj")
+  //   })
+  // }
+
   render(){
+
     return (
-      <div>
-        <Navbar currentRoute={this.state.route} 
-                handleLogin={this.handleLogin} 
-                handleLogout={this.handleLogout}
-        />
+      <div> 
+        {(this.state.isPageLoading===true)?
+          (<PageLoading />):
+          (
+            <div>
+              <Navbar 
+              currentRoute={this.state.route} 
+              handleLogin={this.handleLogin} 
+              handleLogout={this.handleLogout}
+              handleRegister={this.handleRegister}
+              handleHome={this.handleHome}
+              isLoggedIn={this.state.isLoggedIn}
+              handleSave={this.handleSave}
+              isSaveLoading={this.state.isSaveLoading}
+              fullname={this.state.fullname}
+              />
 
-        <Sidebar 
-                 handleProjectName={this.handleProjectName} 
-                 projects={this.state.projects}
-                 handleDeleteProject={this.handleDeleteProject}
-                 handleCurrentProjectId={this.handleCurrentProjectId}
-                 />
+              {this.state.route==="loginpage"?
+              <Loginpage 
+              whenLoginFormRecieveData={this.whenLoginFormRecieveData}
+              />  :
+                (
+                  this.state.route==="registerpage"?
+                  <Registerpage 
+                  onRouteChangeInRegisterForm={this.onRouteChangeInRegisterForm}
+                  /> :
+                  <div>
+                    <Sidebar 
+                    handleProjectName={this.handleProjectName} 
+                    projects={this.state.projects}
+                    handleDeleteProject={this.handleDeleteProject}
+                    handleCurrentProjectId={this.handleCurrentProjectId}
+                    />
 
-        <Workspace 
-                   handleAdd={this.handleAdd}
-                   currentText={this.state.currentText}
-                   currentProjectId={this.state.currentProjectId}
-                   tasks={this.state.tasks}
-                   updateCurrentText={this.updateCurrentText}
-                   handleDeleteTask ={this.handleDeleteTask}
-                   handleCheckSquare={this.handleCheckSquare}
-        />
+                    <Workspace 
+                    handleAdd={this.handleAdd}
+                    currentText={this.state.currentText}
+                    currentProjectId={this.state.currentProjectId}
+                    tasks={this.state.tasks}
+                    updateCurrentText={this.updateCurrentText}
+                    handleDeleteTask ={this.handleDeleteTask}
+                    handleCheckSquare={this.handleCheckSquare}
+                    />
+
+                  </div>
+                )
+            
+              }
+            </div>
+          )
+        }
+        
+ 
       </div>
     )
   }
 }
+
+// window.addEventListener('beforeunload', (event) => {
+//   // Cancel the event as stated by the standard.
+//   event.preventDefault();
+  
+//   if(stateToUpload.gmail.trim()!==""){
+    
+//     fetch("http://localhost:4000/update",{
+//         headers:{
+//             'Content-Type':'application/json'
+//         },
+//         method:"POST",
+//         body: JSON.stringify({
+//           gmail:stateToUpload.gmail,
+//           projects:stateToUpload.projects,
+//           tasks:stateToUpload.tasks
+//         }) 
+//     }).then(res=>res.json())
+//      .then(res=>console.log(res))
+    
+
+//   }else{
+//     console.log("not logged in")
+//   }
+  
+  
+//  console.log(stateToUpload)
+//  Chrome requires returnValue to be set.
+//  event.returnValue = 'your tasks will be saved';
+// });
+
 
 export default App;
 
